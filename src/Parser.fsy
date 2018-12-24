@@ -1,0 +1,67 @@
+﻿
+%{
+
+open SharpSolver.Prelude
+open SharpSolver.Prelude.LexYacc
+open SharpSolver.Absyn
+open SharpSolver.Impl
+
+let neg_monos = List.map monomial_negate
+
+%}
+ 
+
+%token <System.Int32> UINT APEX
+%token <System.Double> FLOAT
+%token <rational> RATIONAL
+%token <string> CMD
+%token VAR PLUS MINUS EQ LT GT LEQ GEQ BRA KET SLASH SQBRA SQKET DERIVE
+%token EOF
+
+%left EQ LT GT LEQ GEQ NEQ
+%left PLUS MINUS
+%nonassoc UMINUS
+
+%type < line > line
+
+%start line
+
+%%
+
+/*
+ * top level
+ */
+
+line: 
+	CMD 						{ Cmd $1 }
+  | expr EOF        		    { Expr $1 }
+  |	expr EQ expr EOF            { Equ ($1, $3) }
+
+mono: 
+    constant                    { Monomial ($1, 0) }
+  | var                         { Monomial (1Q, $1) }
+  | constant var                { Monomial ($1, $2) }
+
+var:
+    VAR                         { 1 }
+  | VAR APEX                    { $2 }
+  | VAR UINT                    { $2 }
+
+constant:
+    UINT                        { rational $1 }
+  | FLOAT                       { rationalize $1 }
+  | RATIONAL                    { $1 }
+
+expr:
+    monos                       { Poly (Polynomial $1) }
+  | DERIVE SQBRA expr SQKET		{ Derive $3 }
+
+monos:
+    mono								{ [$1] }
+  | BRA monos KET						{ $2 }
+  | monos PLUS mono 					{ $1 @ [$3] }
+  | monos MINUS mono					{ $1 @ [monomial_negate $3] }
+  | monos MINUS BRA monos KET			{ $1 @ neg_monos $4 }  
+  | MINUS monos %prec UMINUS			{ neg_monos $2 }
+  
+   

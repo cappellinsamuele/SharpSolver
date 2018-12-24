@@ -1,0 +1,59 @@
+﻿{
+
+module SharpSolver.Lexer
+
+open System
+open Microsoft.FSharp.Text.Lexing
+
+open SharpSolver.Absyn
+open SharpSolver.Parser
+open SharpSolver.Prelude
+open SharpSolver.Prelude.LexYacc
+
+exception LexerError of string
+
+}
+ 
+let whitespace = [' ' '\t' ]
+let newline = ('\n' | "\r\n")
+let digit = ['0'-'9']
+let uint = digit+
+let sint = '-'? uint
+let ureal = uint '.' uint | uint ('e' | 'E') sint
+let sreal = '-'? ureal
+
+
+rule tokenize = parse
+	| eof				{ EOF }
+	| whitespace		{ tokenize lexbuf }
+	| newline			{ newline lexbuf; tokenize lexbuf }
+  
+    | 'x' | 'X'     { VAR }
+    | 'D'		    { DERIVE }
+
+	| '+'			{ PLUS }
+	| '-'			{ MINUS }
+    | '/'           { SLASH }
+
+    | '^' uint      { APEX (Int32.Parse ((lexeme lexbuf).Trim [|'^'|])) }
+
+    | '-' '-'+      { raise (LexerError "multiple minus-signs used as operators") }
+
+    | '='           { EQ }
+  
+	// brackets
+	| '('			{ BRA }
+	| ')'			{ KET }
+	| '['			{ SQBRA }
+	| ']'			{ SQKET }
+
+	// literals
+    | ureal         { FLOAT (parse_float (lexeme lexbuf)) }
+	| uint          { UINT (Int32.Parse (lexeme lexbuf)) }
+    | uint '/' uint { RATIONAL (rational.Parse (lexeme lexbuf)) }
+
+	| '#' ['a'-'z']+	{ let s = lexeme lexbuf in CMD (s.Substring (1, s.Length - 1)) }
+
+
+
+

@@ -1,0 +1,10 @@
+#!/bin/bash
+#pwd
+DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
+cd "${DIR}"
+echo 'Clearing Debug folder...' &&
+rm bin/Debug/SharpSolve.exe
+echo 'Building project...'
+msbuild SharpSolver.sln
+echo 'Executing SharpSolver program...'
+mono bin/Debug/SharpSolver.exe
