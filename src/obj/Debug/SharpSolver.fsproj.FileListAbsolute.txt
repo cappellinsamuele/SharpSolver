@@ -27,3 +27,8 @@ W:\Samuele\Documents\GitHub\SharpSolver\SharpSolver\src\obj\Debug\SharpSolver.ex
 W:\Samuele\Documents\GitHub\SharpSolver\SharpSolver\src\obj\Debug\SharpSolver.fsproj.CopyComplete
 W:\Samuele\Documents\GitHub\SharpSolver\SharpSolver\src\obj\Debug\SharpSolver.exe
 W:\Samuele\Documents\GitHub\SharpSolver\SharpSolver\src\obj\Debug\SharpSolver.pdb
+D:\Samuele\Documenti\GitHub\SharpSolver\src\bin\Debug\SharpSolver.XML
+D:\Samuele\Documenti\GitHub\SharpSolver\src\obj\Debug\SharpSolver.fsprojAssemblyReference.cache
+D:\Samuele\Documenti\GitHub\SharpSolver\src\obj\Debug\SharpSolver.exe.config
+D:\Samuele\Documenti\GitHub\SharpSolver\src\obj\Debug\SharpSolver.exe
+D:\Samuele\Documenti\GitHub\SharpSolver\src\obj\Debug\SharpSolver.pdb

@@ -34,14 +34,14 @@ let polynomial_negate (p : polynomial) : polynomial = match p with
                                                       Polynomial lst -> Polynomial (List.map monomial_negate lst)
 
 let normalized_polynomial_degree (np : normalized_polynomial) : int = 
-    let mutable count = 0
-        in
-        for _ in np do
-           count <- count+1
-    count
+    match np with
+    NormalizedPolynomial arr -> //Array.length (arr)
+                                let mutable count = 0 
+                                for _ in arr do
+                                    count <- count+1
+                                count
 
 
-        
 
 
 let normalize (p : polynomial) : normalized_polynomial = raise (NotImplementedException ())
