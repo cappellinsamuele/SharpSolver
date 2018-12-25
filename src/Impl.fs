@@ -10,6 +10,8 @@ module SharpSolver.Impl
 open Absyn
 open Prelude
 open System
+open System.Runtime.Remoting.Metadata.W3cXsd2001
+open System
 
 let rationalize (x : float) : rational =    
     let rec  aux (numero:float) (app:float) = if(numero*app%10.=0.) then rational(int(numero),int(app))
@@ -27,8 +29,20 @@ let polynomial_degree (p : polynomial) : int =
                                                           |Polynomial((Monomial(coeff,exp)) :: xs) -> if exp > gradoMassimo then aux exp (Polynomial(xs))
                                                                                                                 else aux gradoMassimo (Polynomial(xs))
     in aux 0 p
-let polynomial_negate (p : polynomial) : polynomial = raise (NotImplementedException ())
-let normalized_polynomial_degree (np : normalized_polynomial) : int = raise (NotImplementedException ())
+
+let polynomial_negate (p : polynomial) : polynomial = match p with
+                                                      Polynomial lst -> Polynomial (List.map monomial_negate lst)
+
+let normalized_polynomial_degree (np : normalized_polynomial) : int = 
+    let mutable count = 0
+        in
+        for _ in np do
+           count <- count+1
+    count
+
+
+        
+
 
 let normalize (p : polynomial) : normalized_polynomial = raise (NotImplementedException ())
 let derive (p : polynomial) : polynomial = raise (NotImplementedException ())
