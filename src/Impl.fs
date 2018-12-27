@@ -41,22 +41,30 @@ let normalized_polynomial_degree (np : normalized_polynomial) : int =
                                     count <- count+1
                                 count
 
-
-let normalize (p : polynomial) : normalized_polynomial = raise (NotImplementedException ()) (*scorrere il polinomio e confrontare i gradi. Se trovo un grado che ho già trovato sommo i coefficienti. Alla fine ordino e metto tutti i coefficienti in un array NormalizedPolynomial*)
-    (*let checkdeg (p:polynomial) (n:int) : bool = match p with //working on
-                                                 
+let sumCoeffs (arr: rational[]) (pos:int) (coef:rational) : rational[] = 
+    arr.[pos] <- arr.[pos]+coef (*se non funziona decomporre e fare la somma di frazioni*)
+    arr
+let normalize (p : polynomial) : normalized_polynomial = 
+    (*STEPS:
+        -> ricavare il grado del polinomio
+        -> creare un array con numero di posti pari al grado del polinomio
+        -> scorrere la lista (p) di monomi e controllarne il grado ad ogni iterazione. Quindi aggiornare la posizione dell'array (in posizione indicata dal grado del polinomio analizzato)
+    *)  
+    let risultati : rational[] = Array.create (polynomial_degree p) (rational(0,0))
         in
-             let rec degCount (p:polynomial) (count:int) : int = match p with
-                                                                 |Polynomial([]) -> count
-                                                                 |Polynomial ((Monomial(coef,exp))::xs) -> if (checkdeg p monomial_degree(Monomial(coef,exp))) then degCount (Polynomial(xs)) count else degCount (Polynomial(xs)) (count+1)
-             in degCount p 0*)
-                                       
+            let rec scorri (lst:polynomial) (risultati : rational[]) = match lst with
+                                                                       Polynomial([]) -> risultati
+                                                                       |Polynomial(Monomial(coeff,exp)::xs) -> scorri (Polynomial xs) (sumCoeffs risultati exp coeff)
+            in scorri p risultati
+    NormalizedPolynomial(risultati)
+
 let derive (p : polynomial) : polynomial = raise (NotImplementedException ())
 let reduce (e : expr) : polynomial = raise (NotImplementedException ())
 
 let solve0 (np : normalized_polynomial) : bool = raise (NotImplementedException ())
 let solve1 (np : normalized_polynomial) : rational = raise (NotImplementedException ())
 let solve2 (np : normalized_polynomial) : (float * float option) option = raise (NotImplementedException ())
+
 
 
 
