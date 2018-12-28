@@ -36,7 +36,7 @@ let polynomial_negate (p : polynomial) : polynomial = match p with (*ricavo la l
 let normalized_polynomial_degree (np : normalized_polynomial) : int = 
     match np with
     NormalizedPolynomial arr -> //Array.length (arr) (*ricavo l'array dall'argomento np e lo scorro contando gli elementi. il numero di elementi corrisponde al grado*)
-                                let mutable count = 0 
+                                let mutable count =  1
                                 for _ in arr do
                                     count <- count+1
                                 count
