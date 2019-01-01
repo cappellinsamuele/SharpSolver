@@ -58,7 +58,14 @@ let normalize (p : polynomial) : normalized_polynomial =
             in scorri p risultati
     NormalizedPolynomial(risultati)
 
-let derive (p : polynomial) : polynomial = raise (NotImplementedException ())
+let derive (p : polynomial) : polynomial =
+    match p with
+    |Polynomial lst -> let rec aux (ls : monomial list) : monomial list =
+                            match ls with
+                            |[] -> ls
+                            |Monomial(coef,deg)::xs -> Monomial((rational((coef.D),(coef.N*deg))),(deg-1))::aux xs
+                        in Polynomial(aux lst)
+
 let reduce (e : expr) : polynomial = raise (NotImplementedException ())
 
 let solve0 (np : normalized_polynomial) : bool = raise (NotImplementedException ())
