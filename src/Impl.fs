@@ -36,8 +36,8 @@ let polynomial_negate (p : polynomial) : polynomial = match p with (*ricavo la l
 let normalized_polynomial_degree (np : normalized_polynomial) : int = 
     match np with
     NormalizedPolynomial arr -> //Array.length (arr) (*ricavo l'array dall'argomento np e lo scorro contando gli elementi. il numero di elementi corrisponde al grado*)
-                                let mutable count =  1
-                                for _ in arr do
+                                let mutable count =  -1
+                                for i in arr do
                                     count <- count+1
                                 count
 
@@ -50,25 +50,28 @@ let normalize (p : polynomial) : normalized_polynomial =
         -> creare un array con numero di posti pari al grado del polinomio
         -> scorrere la lista (p) di monomi e controllarne il grado ad ogni iterazione. Quindi aggiornare la posizione dell'array (in posizione indicata dal grado del polinomio analizzato)
     *)  
-    let risultati : rational[] = Array.create (polynomial_degree p) (rational(0,0))
+    let risultati = Array.create (polynomial_degree p + 1) (rational.Zero)
         in
-            let rec scorri (lst:polynomial) (risultati : rational[]) = match lst with
-                                                                       Polynomial([]) -> risultati
-                                                                       |Polynomial(Monomial(coeff,exp)::xs) -> scorri (Polynomial xs) (sumCoeffs risultati exp coeff)
-            in scorri p risultati
+            let rec scorri lst risultati = match lst with
+                                           Polynomial([]) -> risultati
+                                           |Polynomial(Monomial(coeff,exp)::xs) -> scorri (Polynomial xs) (sumCoeffs risultati exp coeff)
+            in let a=scorri p risultati
     NormalizedPolynomial(risultati)
+
 
 let derive (p : polynomial) : polynomial =
     match p with
     |Polynomial lst -> let rec aux (ls : monomial list) : monomial list =
                             match ls with
                             |[] -> ls
-                            |Monomial(coef,deg)::xs -> Monomial((rational((coef.D),(coef.N*deg))),(deg-1))::aux xs
+                            |Monomial(coef,deg)::xs -> Monomial((rational((coef.N*deg),(coef.D))),(deg-1))::aux xs
                         in Polynomial(aux lst)
 
 let reduce (e : expr) : polynomial = raise (NotImplementedException ())
 
-let solve0 (np : normalized_polynomial) : bool = raise (NotImplementedException ())
+let solve0 (np : normalized_polynomial) : bool = 
+    match np with
+    NormalizedPolynomial arr -> arr.[0]=rational.Zero
 let solve1 (np : normalized_polynomial) : rational = raise (NotImplementedException ())
 let solve2 (np : normalized_polynomial) : (float * float option) option = raise (NotImplementedException ())
 

@@ -11,6 +11,13 @@ open Absyn
 open System
 open Prelude
 open Microsoft.FSharp.Text
+open SharpSolver
+open SharpSolver
+open SharpSolver
+open SharpSolver
+open SharpSolver
+open SharpSolver
+open SharpSolver
 
 
 // funzioni di logging e printing
@@ -76,6 +83,19 @@ let interpreter_loop () =
 
             // TODO: aggiungere qui sotto i pattern per i casi Expr ed Equ con relativo codice per, rispettivamente, normalizzare espressioni e risolvere equazioni
 
+            |Expr e1 -> 
+                match e1 with
+                    Poly toDer -> let pol = Impl.derive toDer
+                                  hout "derive" "%O" pol
+                                  let norm = Impl.normalize toDer
+                                  hout "norm" "%O" norm
+                                  let deg = Impl.normalized_polynomial_degree(norm)
+                                  hout "degree" "%O" deg
+            |Equ (e1, e2) -> 
+                match e1, e2 with
+                    ((Poly a), (Poly b)) -> //if(Impl.solve0(Impl.normalize () )) then printf "[sol] 0" else printf "false"  //SMONTARE L'OGGETTO POLINOMIO E OTTENERE LA LISTA DI MONOMI VERA E PROPRIA
+                                            match (a,b) with
+                                            l1,l2 -> if(Impl.solve0(Impl.normalize((Impl.polynomial_negate l2) @ l1))) then printf "[sol] 0" else printf "false"
             | _ -> raise (NotImplementedException (sprintf "unknown command or expression: %O" line))
                    
         // gestione delle eccezioni
