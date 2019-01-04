@@ -10,6 +10,7 @@ open Microsoft.FSharp.Text.Lexing
 open Absyn
 open System
 open Prelude
+open Impl
 open Microsoft.FSharp.Text
 open SharpSolver
 open SharpSolver
