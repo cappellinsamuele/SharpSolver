@@ -86,18 +86,21 @@ let interpreter_loop () =
 
             |Expr e1 -> 
                 match e1 with
-                    Poly toDer -> let pol = Impl.derive toDer
+                    Poly toDer -> hout "redux" "%O" (Impl.reduce(e1))
+                                  let pol = Impl.derive toDer
                                   hout "derive" "%O" pol
                                   let norm = Impl.normalize toDer
                                   hout "norm" "%O" norm
                                   let deg = Impl.normalized_polynomial_degree(norm)
                                   hout "degree" "%O" deg
+                                  
+                    |Derive toDer -> hout "redux" "%O" (Impl.reduce(toDer))
             |Equ (e1, e2) -> 
                 match e1, e2 with           //Controllo i casi, guardo se Equ ha entrambi Poly di grado zero così da poter risolvere con solve0
                 ((Poly a), (Poly b)) -> if Impl.polynomial_degree (a) = 0 && Impl.polynomial_degree (b) = 0 then
                                                 let valA = Impl.normalize(a)
                                                 let valB = Impl.normalize(b)
-                                                if Impl.solve0(valB) then hout "solve0" "%O" (Impl.solve0 (valA))
+                                                if Impl.solve0(valB) then hout "solve0" "%O" (Impl.solve0 (valA)) //PER RICI: AGGIUNGERE I TAG SULL'OUTPUT (TIPO "identity")
                                                 else if valA = valB then hout "solve0" "%O" "True"
                                                                     else hout "solve0" "%O" "False"
                                         else failwith "ERRORE"       

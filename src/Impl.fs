@@ -66,8 +66,24 @@ let derive (p : polynomial) : polynomial =
                             |[] -> ls
                             |Monomial(coef,deg)::xs -> Monomial((rational((coef.N*deg),(coef.D))),(deg-1))::aux xs
                         in Polynomial(aux lst)
+let rec countReduction (e:expr) = 
+    match e with
+    |Poly pol -> 0
+    |Derive der ->  1 + countReduction der //così derivo solo l'espressione più interna
+let rec extractPoly (e:expr) : polynomial =
+    match e with
+    |Poly p -> p
+    |Derive der -> extractPoly der
+let reduce (e : expr) : polynomial = 
+    let mutable countRed = countReduction e 
+    let mutable pol = extractPoly e
+   // let mutable result:polynomial = Polynomial [Monomial(rational.Zero,0)]
+    while (countRed>=0) do
+            pol <- derive pol
+            countRed <- countRed-1
+    pol
 
-let reduce (e : expr) : polynomial = raise (NotImplementedException ())
+
 
 let solve0 (np : normalized_polynomial) : bool = 
     match np with
@@ -75,7 +91,19 @@ let solve0 (np : normalized_polynomial) : bool =
 let solve1 (np : normalized_polynomial) : rational = 
     match np with
     NormalizedPolynomial arr -> -(arr.[0]/arr.[1])
-let solve2 (np : normalized_polynomial) : (float * float option) option = raise (NotImplementedException ())
+let solve2 (np : normalized_polynomial) : (float * float option) option = 
+    match np with
+    NormalizedPolynomial arr -> let delta = arr.[1]**2-rational(4,1)*arr.[2]*arr.[0]
+                                    in 
+                                        if (delta<rational.Zero) then None
+                                        else 
+                                            let x1 = ((-(rational.op_Implicit arr.[1]))+rational.Sqrt(delta))/2.*rational.op_Implicit arr.[2]
+                                            let x2 = ((-(rational.op_Implicit arr.[1]))-rational.Sqrt(delta))/2.*rational.op_Implicit arr.[2]
+                                                in
+                                                    if (x1=x2) then Some(x1, None) 
+                                                    else Some (x1, Some x2)
+
+                                            
 
 
 
