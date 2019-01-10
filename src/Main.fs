@@ -93,10 +93,22 @@ let interpreter_loop () =
                                   let deg = Impl.normalized_polynomial_degree(norm)
                                   hout "degree" "%O" deg
             |Equ (e1, e2) -> 
-                match e1, e2 with
-                    ((Poly a), (Poly b)) -> //if(Impl.solve0(Impl.normalize () )) then printf "[sol] 0" else printf "false"  //SMONTARE L'OGGETTO POLINOMIO E OTTENERE LA LISTA DI MONOMI VERA E PROPRIA
-                                            match (a,b) with
-                                            l1,l2 -> if(Impl.solve0(Impl.normalize((Impl.polynomial_negate l2) @ l1))) then printf "[sol] 0" else printf "false"
+                match e1, e2 with           //Controllo i casi, guardo se Equ ha entrambi Poly di grado zero così da poter risolvere con solve0
+                ((Poly a), (Poly b)) -> if Impl.polynomial_degree (a) = 0 && Impl.polynomial_degree (b) = 0 then
+                                                let valA = Impl.normalize(a)
+                                                let valB = Impl.normalize(b)
+                                                if Impl.solve0(valB) then hout "solve0" "%O" (Impl.solve0 (valA))
+                                                else if valA = valB then hout "solve0" "%O" "True"
+                                                                    else hout "solve0" "%O" "False"
+                                        else failwith "ERRORE"       
+
+                                            //Controllo se almeno uno dei due Poly ha grado uno e risolvo con solve1
+                                            (*else if Impl.polynomial_degree (a) = 1 || Impl.polynomial_degree (b) = 1 then
+                                                let valA1 = (Impl.normalize(a) :: Impl.normalize(b))
+                                                let res = Impl.solve1(Impl.normalize(valA1))
+                                                hout "solve1" res*)                                                 
+                                            //if(Impl.solve0(Impl.normalize () )) then printf "[sol] 0" else printf "false"  //SMONTARE L'OGGETTO POLINOMIO E OTTENERE LA LISTA DI MONOMI VERA E PROPRIA
+              
             | _ -> raise (NotImplementedException (sprintf "unknown command or expression: %O" line))
                    
         // gestione delle eccezioni

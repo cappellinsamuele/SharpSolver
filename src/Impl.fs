@@ -72,7 +72,9 @@ let reduce (e : expr) : polynomial = raise (NotImplementedException ())
 let solve0 (np : normalized_polynomial) : bool = 
     match np with
     NormalizedPolynomial arr -> arr.[0]=rational.Zero
-let solve1 (np : normalized_polynomial) : rational = raise (NotImplementedException ())
+let solve1 (np : normalized_polynomial) : rational = 
+    match np with
+    NormalizedPolynomial arr -> -(arr.[0]/arr.[1])
 let solve2 (np : normalized_polynomial) : (float * float option) option = raise (NotImplementedException ())
 
 
