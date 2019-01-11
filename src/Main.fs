@@ -87,14 +87,14 @@ let interpreter_loop () =
             |Expr e1 -> 
                 match e1 with
                     Poly toDer -> hout "redux" "%O" (Impl.reduce(e1))
-                                  let polynomailToDer = Impl.derive toDer
-                                  hout "derive" "%O" polynomailToDer
+                                  //let polynomailToDer = Impl.derive toDer
+                                  //hout "derive" "%O" polynomailToDer
                                   let normalizedExpr = Impl.normalize toDer
                                   hout "norm" "%O" normalizedExpr
                                   let polynomialDegree = Impl.normalized_polynomial_degree(normalizedExpr)
                                   hout "degree" "%O" polynomialDegree
                                   
-                    |Derive toDer -> hout "redux" "%O" (Impl.reduce(toDer))
+                    |Derive toDer -> hout "redux" "%O" (Impl.reduce(e1))
             |Equ (e1, e2) -> 
                 match e1, e2 with           //Controllo i casi, guardo se Equ ha entrambi Poly di grado zero così da poter risolvere con solve0
                 ((Poly a), (Poly b)) -> if Impl.polynomial_degree (a) = 0 && Impl.polynomial_degree (b) = 0 then

@@ -66,6 +66,14 @@ let derive (p : polynomial) : polynomial =
                             |[] -> ls
                             |Monomial(coef,deg)::xs -> Monomial((rational((coef.N*deg),(coef.D))),(deg-1))::aux xs
                         in Polynomial(aux lst)
+
+let rec sumZeros (p: polynomial) : polynomial =
+    match p with
+    Polynomial lst -> let rec scan (ls : monomial list) =
+                        match ls with
+                        [] -> ls
+                        |Monomial(coef,deg)::xs -> if (coef=rational.Zero) then scan xs else Monomial(coef,deg)::scan xs
+                      in Polynomial(scan lst)                      
 let rec countReduction (e:expr) = 
     match e with
     |Poly pol -> 0
@@ -75,13 +83,15 @@ let rec extractPoly (e:expr) : polynomial =
     |Poly p -> p
     |Derive der -> extractPoly der
 let reduce (e : expr) : polynomial = 
-    let mutable countRed = countReduction e 
-    let mutable pol = extractPoly e
-   // let mutable result:polynomial = Polynomial [Monomial(rational.Zero,0)]
-    while (countRed>=0) do
-            pol <- derive pol
-            countRed <- countRed-1
-    pol
+    match e with 
+    |Derive ex ->   let mutable countRed = countReduction ex 
+                    let mutable pol = extractPoly ex
+                    // let mutable result:polynomial = Polynomial [Monomial(rational.Zero,0)]
+                    while (countRed>=0) do
+                            pol <- derive pol
+                            countRed <- countRed-1
+                    sumZeros(pol)
+    |Poly p -> p
 
 
 
