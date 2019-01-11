@@ -87,23 +87,36 @@ let interpreter_loop () =
             |Expr e1 -> 
                 match e1 with
                     Poly toDer -> hout "redux" "%O" (Impl.reduce(e1))
-                                  let pol = Impl.derive toDer
-                                  hout "derive" "%O" pol
-                                  let norm = Impl.normalize toDer
-                                  hout "norm" "%O" norm
-                                  let deg = Impl.normalized_polynomial_degree(norm)
-                                  hout "degree" "%O" deg
+                                  let polynomailToDer = Impl.derive toDer
+                                  hout "derive" "%O" polynomailToDer
+                                  let normalizedExpr = Impl.normalize toDer
+                                  hout "norm" "%O" normalizedExpr
+                                  let polynomialDegree = Impl.normalized_polynomial_degree(normalizedExpr)
+                                  hout "degree" "%O" polynomialDegree
                                   
                     |Derive toDer -> hout "redux" "%O" (Impl.reduce(toDer))
             |Equ (e1, e2) -> 
                 match e1, e2 with           //Controllo i casi, guardo se Equ ha entrambi Poly di grado zero così da poter risolvere con solve0
                 ((Poly a), (Poly b)) -> if Impl.polynomial_degree (a) = 0 && Impl.polynomial_degree (b) = 0 then
-                                                let valA = Impl.normalize(a)
-                                                let valB = Impl.normalize(b)
-                                                if Impl.solve0(valB) then hout "solve0" "%O" (Impl.solve0 (valA)) //PER RICI: AGGIUNGERE I TAG SULL'OUTPUT (TIPO "identity")
-                                                else if valA = valB then hout "solve0" "%O" "True"
-                                                                    else hout "solve0" "%O" "False"
-                                        else failwith "ERRORE"       
+                                                let normPolynomialA = Impl.normalize(a)
+                                                let normPolynomialB = Impl.normalize(b)
+                                                if Impl.solve0(normPolynomialB) then hout "ident" "%O" (Impl.solve0 (normPolynomialA)) //PER RICI: AGGIUNGERE I TAG SULL'OUTPUT (TIPO "identity")
+                                                else if normPolynomialA = normPolynomialB then hout "ident" "%O" "True"
+                                                                                          else hout "ident" "%O" "False"
+                                        
+                                        else if  Impl.polynomial_degree (a) = 1 || Impl.polynomial_degree (b) = 1 then
+                                                let normPolynomialA1 = Impl.normalize(a)
+                                                let normPolynomialB1 = Impl.normalize(Impl.polynomial_negate(b))
+
+                                                match normPolynomialA1,normPolynomialB1 with
+                                                NormalizedPolynomial a1, NormalizedPolynomial b1 -> let mutable arrA = []
+                                                                                                    let mutable arrB = []
+                                                                                                    for i in a1 do
+                                                                                                        arrA <- [i]@arrA
+                                                                                                    for i in b1 do 
+                                                                                                        arrB <- [i]@arrB
+
+                                        else failwith "ERRORE"
 
                                             //Controllo se almeno uno dei due Poly ha grado uno e risolvo con solve1
                                             (*else if Impl.polynomial_degree (a) = 1 || Impl.polynomial_degree (b) = 1 then
