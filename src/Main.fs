@@ -100,7 +100,7 @@ let interpreter_loop () =
                 ((Poly a), (Poly b)) -> if Impl.polynomial_degree (a) = 0 && Impl.polynomial_degree (b) = 0 then
                                                 let normPolynomialA = Impl.normalize(a)
                                                 let normPolynomialB = Impl.normalize(b)
-                                                if Impl.solve0(normPolynomialB) then hout "ident" "%O" (Impl.solve0 (normPolynomialA)) //PER RICI: AGGIUNGERE I TAG SULL'OUTPUT (TIPO "identity")
+                                                if Impl.solve0(normPolynomialB) then hout "ident" "%O" (Impl.solve0 (normPolynomialA)) 
                                                 else if normPolynomialA = normPolynomialB then hout "ident" "%O" "True"
                                                                                           else hout "ident" "%O" "False"
                                         
