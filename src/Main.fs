@@ -19,6 +19,7 @@ open SharpSolver
 open SharpSolver
 open SharpSolver
 open SharpSolver
+open System.Security.Cryptography
 
 
 // funzioni di logging e printing
@@ -69,6 +70,33 @@ let interpreter_loop () =
             hout "pretty" "%O" line
             #endif
 
+            //Con functionOutputEqu, stampo a video i vari valori. In questo modo evito la ripetizione di codice quando vado ad analizzare i vari casi di Equ
+            let functionOutputEqu (monomialList : monomial list) =  let normalizedList = Impl.normalize(Polynomial(monomialList))
+                                                                    hout "norm" "%O = 0" normalizedList
+
+                                                                    let equDegree = Impl.polynomial_degree(Polynomial(monomialList))
+                                                                    hout "degree" "%O" equDegree
+
+                                                                    if Impl.polynomial_degree(Polynomial(monomialList)) = 0 then
+                                                                        if Impl.solve0(normalizedList) then hout "ident" "%O" "True"
+                                                                                                       else hout "ident" "%O" "False"
+
+                                                                    else if Impl.polynomial_degree(Polynomial(monomialList)) = 1 then
+                                                                     let resultGradeOne = Impl.solve1(normalizedList)
+                                                                     hout "sol" "%O" resultGradeOne
+
+                                                                    else if Impl.polynomial_degree(Polynomial(monomialList))  = 2 then   
+                                                                      let resultGradeTwo = Impl.solve2(normalizedList)
+                                                                      hout "sol" "%O" resultGradeTwo
+    
+            //Con functionOutputExpr, stampo a video i vari valori. In questo modo evito la ripetizione di codice quando vado ad analizzare i vari casi di Expr
+            let functionOutputExpr (toDer : expr) = let reduxExpr = Impl.reduce(toDer)
+                                                    hout "redux" "%O" reduxExpr
+                                                    let normalizedExpr = Impl.normalize reduxExpr
+                                                    hout "norm" "%O" normalizedExpr
+                                                    let polynomialDegree = Impl.normalized_polynomial_degree(normalizedExpr)
+                                                    hout "degree" "%O" polynomialDegree
+
             // interpreta la linea in base al valore di tipo line prodotto dal parsing
             match line with
             | Cmd "help" ->
@@ -86,40 +114,37 @@ let interpreter_loop () =
 
             |Expr e1 -> 
                 match e1 with
-                    Poly toDer -> hout "redux" "%O" (Impl.reduce(e1))
-                                  //let polynomailToDer = Impl.derive toDer
-                                  //hout "derive" "%O" polynomailToDer
-                                  let normalizedExpr = Impl.normalize toDer
-                                  hout "norm" "%O" normalizedExpr
-                                  let polynomialDegree = Impl.normalized_polynomial_degree(normalizedExpr)
-                                  hout "degree" "%O" polynomialDegree
+                    Poly toDer -> functionOutputExpr e1
                                   
-                    |Derive toDer -> hout "redux" "%O" (Impl.reduce(e1))
+                    |Derive toDer -> functionOutputExpr e1
             |Equ (e1, e2) -> 
                 match e1, e2 with
                 ((Poly a), (Poly b)) -> match a,Impl.polynomial_negate (b) with
                                         Polynomial a1, Polynomial b1 -> 
-                                            let monomialList = a1 @ b1                                           
-
-                                            let normalizedList = Impl.normalize(Polynomial(monomialList))
-                                            hout "norm" "%O" normalizedList
-
-                                            let equDegree = Impl.polynomial_degree(Polynomial(monomialList))
-                                            hout "degree" "%O" equDegree
-
-                                            if Impl.polynomial_degree(Polynomial(monomialList)) = 0 then
-                                                if Impl.solve0(normalizedList) then hout "ident" "%O" "True"
-                                                                               else hout "ident" "%O" "False"
-
-                                            else if Impl.polynomial_degree(Polynomial(monomialList)) = 1 then
-                                                let resultGradeOne = Impl.solve1(normalizedList)
-                                                hout "sol" "%O" resultGradeOne
-
-                                            else if Impl.polynomial_degree(Polynomial(monomialList))  = 2 then   
-                                                let resultGradeTwo = Impl.solve2(normalizedList)
-                                                hout "sol" "%O" resultGradeTwo
+                                            let monomialList = a1 @ b1                                            
+                                            functionOutputEqu monomialList
                                                  
-                |(Derive a),(Derive b) -> hout "" "%O" None
+                |(Derive a),(Derive b) -> let reduceA = Impl.reduce(a)
+                                          let reduceB = Impl.reduce(b)
+
+                                          match reduceA,Impl.polynomial_negate(reduceB) with
+                                          Polynomial a1,Polynomial b1 ->
+                                            let monomialList = a1 @ b1
+                                            functionOutputEqu monomialList
+
+                |(Poly a),(Derive b) -> let reduceB = Impl.reduce(b)
+
+                                        match a,Impl.polynomial_negate(reduceB) with
+                                        Polynomial a1,Polynomial b1 ->
+                                          let monomialList = a1 @ b1
+                                          functionOutputEqu monomialList
+                
+                |(Derive a),(Poly b) -> let reduceA = Impl.reduce(a)
+
+                                        match reduceA,Impl.polynomial_negate(b) with
+                                        Polynomial a1,Polynomial b1 ->
+                                          let monomialList = a1 @ b1
+                                          functionOutputEqu monomialList
               
             | _ -> raise (NotImplementedException (sprintf "unknown command or expression: %O" line))
                    

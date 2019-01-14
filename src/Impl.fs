@@ -84,7 +84,7 @@ let rec extractPoly (e:expr) : polynomial =
     |Derive der -> extractPoly der
 let reduce (e : expr) : polynomial = 
     match e with 
-    |Derive ex ->   let mutable countRed = countReduction ex 
+    |Derive ex ->   let mutable countRed = countReduction ex
                     let mutable pol = extractPoly ex
                     // let mutable result:polynomial = Polynomial [Monomial(rational.Zero,0)]
                     while (countRed>=0) do
