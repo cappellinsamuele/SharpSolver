@@ -91,22 +91,30 @@ let reduce (e : expr) : polynomial =
                     sumZeros(pol) //prima di ritornare il polinomio elimino gli elementi nulli
     |Poly p -> p //se trovo un polinomio lo ritorno subito 
 
-let solve0 (np : normalized_polynomial) : bool = //ricavo l'array di rational dal parametro. Il polinomio associato sarà di grado 0 e verrà passato dal main come un unico polinomio 
+let solve0 (np : normalized_polynomial) : bool = 
+    (*ricavo l'array di rational dal parametro. Il polinomio associato sarà di grado 0 e verrà passato dal main come un unico polinomio concatenando la parte prima dell'= con quella dopo.
+    Otterremo così un espressione del tipo "n = 0" (abbiamo un polinomio normalizzato), per cui se l'array in posizione 0 contenuto nel polinomio normalizzato equivale al razionale 0 
+    allora la funzione ritornerà true*)
     match np with
     NormalizedPolynomial arr -> arr.[0]=rational.Zero
 
 let solve1 (np : normalized_polynomial) : rational = 
+    (*ricavo l'array di rational dal parametro. Il polinomio associato sarà di grado 1 e verrà passato dal main come un unico polinomio concatenando la parte prima dell'= con quella dopo.
+    Otterremo così un'espressione del tipo ax + c = 0 (abbiamo un polinomio normalizzato), quindi troveremo x con l'operazione -c/a *)
     match np with
     NormalizedPolynomial arr -> -(arr.[0]/arr.[1])
 
 let solve2 (np : normalized_polynomial) : (float * float option) option = 
+    (*ricavo l'array di rational dal parametro. Il polinomio associato sarà di grado 2 e verrà passato dal main come un unico polinomio concatenando la parte prima dell'= con quella dopo.
+    Otterremo così un espressione del tipo ax + bx^2 + c = 0 (abbiamo un polinomio normalizzato). Per risolvere l'equazione di secondo grado calcolo il delta. Se il delta è negativo 
+    l'equazione non ha soluzioni, se è uguale a 0 ha una soluzione (due coincidenti), mentre se è positivo verranno restituite le due radici calcolate attraverso la formula (-b+-sqrt(b^2-4ac))/2a *)
     match np with
     NormalizedPolynomial arr -> let delta = arr.[1]**2-rational(4,1)*arr.[2]*arr.[0]
                                     in 
                                         if (delta<rational.Zero) then None
                                         else 
-                                            let x1 = ((-(rational.op_Implicit arr.[1]))+rational.Sqrt(delta))/2.*rational.op_Implicit arr.[2]
-                                            let x2 = ((-(rational.op_Implicit arr.[1]))-rational.Sqrt(delta))/2.*rational.op_Implicit arr.[2]
+                                            let x1 = ((-(rational.op_Implicit arr.[1]))+rational.Sqrt(delta))/(2.*rational.op_Implicit arr.[2]) //Lavoro coi tipi rational quindi utilizzo i loro metodi 
+                                            let x2 = ((-(rational.op_Implicit arr.[1]))-rational.Sqrt(delta))/(2.*rational.op_Implicit arr.[2])
                                                 in
                                                     if (x1=x2) then Some(x1, None) 
                                                     else Some (x1, Some x2)
