@@ -96,34 +96,30 @@ let interpreter_loop () =
                                   
                     |Derive toDer -> hout "redux" "%O" (Impl.reduce(e1))
             |Equ (e1, e2) -> 
-                match e1, e2 with           //Controllo i casi, guardo se Equ ha entrambi Poly di grado zero così da poter risolvere con solve0
-                ((Poly a), (Poly b)) -> if Impl.polynomial_degree (a) = 0 && Impl.polynomial_degree (b) = 0 then
-                                                let normPolynomialA = Impl.normalize(a)
-                                                let normPolynomialB = Impl.normalize(b)
-                                                if Impl.solve0(normPolynomialB) then hout "ident" "%O" (Impl.solve0 (normPolynomialA)) 
-                                                else if normPolynomialA = normPolynomialB then hout "ident" "%O" "True"
-                                                                                          else hout "ident" "%O" "False"
-                                        
-                                        else if  Impl.polynomial_degree (a) = 1 || Impl.polynomial_degree (b) = 1 then
-                                                let normPolynomialA1 = Impl.normalize(a)
-                                                let normPolynomialB1 = Impl.normalize(Impl.polynomial_negate(b))
+                match e1, e2 with
+                ((Poly a), (Poly b)) -> match a,Impl.polynomial_negate (b) with
+                                        Polynomial a1, Polynomial b1 -> 
+                                            let monomialList = a1 @ b1                                           
 
-                                                match normPolynomialA1,normPolynomialB1 with
-                                                NormalizedPolynomial a1, NormalizedPolynomial b1 -> let mutable arrA = []
-                                                                                                    let mutable arrB = []
-                                                                                                    for i in a1 do
-                                                                                                        arrA <- [i]@arrA
-                                                                                                    for i in b1 do 
-                                                                                                        arrB <- [i]@arrB
+                                            let normalizedList = Impl.normalize(Polynomial(monomialList))
+                                            hout "norm" "%O" normalizedList
 
-                                        else failwith "ERRORE"
+                                            let equDegree = Impl.polynomial_degree(Polynomial(monomialList))
+                                            hout "degree" "%O" equDegree
 
-                                            //Controllo se almeno uno dei due Poly ha grado uno e risolvo con solve1
-                                            (*else if Impl.polynomial_degree (a) = 1 || Impl.polynomial_degree (b) = 1 then
-                                                let valA1 = (Impl.normalize(a) :: Impl.normalize(b))
-                                                let res = Impl.solve1(Impl.normalize(valA1))
-                                                hout "solve1" res*)                                                 
-                                            //if(Impl.solve0(Impl.normalize () )) then printf "[sol] 0" else printf "false"  //SMONTARE L'OGGETTO POLINOMIO E OTTENERE LA LISTA DI MONOMI VERA E PROPRIA
+                                            if Impl.polynomial_degree(Polynomial(monomialList)) = 0 then
+                                                if Impl.solve0(normalizedList) then hout "ident" "%O" "True"
+                                                                               else hout "ident" "%O" "False"
+
+                                            else if Impl.polynomial_degree(Polynomial(monomialList)) = 1 then
+                                                let resultGradeOne = Impl.solve1(normalizedList)
+                                                hout "sol" "%O" resultGradeOne
+
+                                            else if Impl.polynomial_degree(Polynomial(monomialList))  = 2 then   
+                                                let resultGradeTwo = Impl.solve2(normalizedList)
+                                                hout "sol" "%O" resultGradeTwo
+                                                 
+                |(Derive a),(Derive b) -> hout "" "%O" None
               
             | _ -> raise (NotImplementedException (sprintf "unknown command or expression: %O" line))
                    
