@@ -64,7 +64,7 @@ let interpreter_loop () =
             hout "pretty" "%O" line
             #endif
 
-            //Con functionOutputEqu, stampo a video i vari valori. In questo modo evito la ripetizione di codice quando vado ad analizzare i vari casi di Equ
+            //functionOutputEqu: funzione che viene chiamata nel pattern Match di Equ. Questo serve per eliminare la ripetizione del codice in ogni caso del pattern match dove alla fine bisogna stampare a video i risultati ottenuti
             let functionOutputEqu (monomialList : monomial list) =  let normalizedList = Impl.normalize(Polynomial(monomialList))
                                                                     norm "%O = 0" normalizedList
 
@@ -81,6 +81,7 @@ let interpreter_loop () =
 
                                                                     else if Impl.polynomial_degree(Polynomial(monomialList)) = 2 then   
                                                                       let resultGradeTwo = Impl.solve2(normalizedList)
+                                                                      //Scompatto il valore di resultGradeTwo così da ottenere i valori x1,x2 dell'equazione di secondo grado
                                                                       let mutable x1 = 0.
                                                                       let mutable x2 : float option = None
                                                                       match resultGradeTwo with
@@ -89,7 +90,7 @@ let interpreter_loop () =
                                                                       |None -> x1<-0.
                                                                       sol "x1 = %O vel x2 = %O" x1 x2.Value
     
-            //Con functionOutputExpr, stampo a video i vari valori. In questo modo evito la ripetizione di codice quando vado ad analizzare i vari casi di Expr
+            //functionOutputExpr svolge la stessa funzione di functionOutputEqu solo che questo viene invocato all'interno del match di Expr.
             let functionOutputExpr (toDer : expr) = let reduxExpr = Impl.reduce(toDer)
                                                     redux "%O" reduxExpr
                                                     let normalizedExpr = Impl.normalize reduxExpr
@@ -112,15 +113,19 @@ let interpreter_loop () =
 
             // TODO: aggiungere qui sotto i pattern per i casi Expr ed Equ con relativo codice per, rispettivamente, normalizzare espressioni e risolvere equazioni
 
+            (*Gestione del pattern match per i Casi Expr ed Equ:
+                - Expr: ricevo in input un valore di tipo Expr, il quale può contenere Poly oppure Derive. Nel secondo caso, applico il reduce all'espressione, in modo tale da derivarla. Prendo poi il polinomio ottenuto e applico functionOutputExpr per generare l'output.
+                - Equ: ricevo in input due valori di tipo Expr, che possono essere Poly o Derive. In base al loro tipo svolgo il reduce dell'espressione di tipo Derive, concateno i le due liste di monomi e infine applico functionOutputEqu per generare l'output.
+            *)
             |Expr e1 -> 
                 match e1 with
                     Poly toDer -> functionOutputExpr e1                                  
                     |Derive toDer -> functionOutputExpr e1
 
-            |Equ (e1, e2) -> 
-                
+            |Equ (e1, e2) ->                 
                 match e1, e2 with
-                ((Poly a), (Poly b)) -> redux "%O = %O" a b
+                ((Poly a), (Poly b)) -> 
+                                        redux "%O = %O" a b
                                         match a,Impl.polynomial_negate (b) with
                                         Polynomial a1, Polynomial b1 -> 
                                             let monomialList = a1 @ b1                                            
@@ -134,14 +139,14 @@ let interpreter_loop () =
                                             let monomialList = a1 @ b1
                                             functionOutputEqu monomialList
 
-                |(Poly a),(Derive b) -> let reduceB = Impl.reduce(b)
+                |(Poly a),(Derive b) -> let reduceB = Impl.reduce(e2)
                                         redux "%O = %O" a reduceB
                                         match a,Impl.polynomial_negate(reduceB) with
                                         Polynomial a1,Polynomial b1 ->
                                           let monomialList = a1 @ b1
                                           functionOutputEqu monomialList
                 
-                |(Derive a),(Poly b) -> let reduceA = Impl.reduce(a)
+                |(Derive a),(Poly b) -> let reduceA = Impl.reduce(e1)
                                         redux "%O = %O" reduceA b
                                         match reduceA,Impl.polynomial_negate(b) with
                                         Polynomial a1,Polynomial b1 ->

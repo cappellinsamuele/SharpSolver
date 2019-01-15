@@ -13,7 +13,7 @@ open System
 open System.Runtime.Remoting.Metadata.W3cXsd2001
 open System
 
-let rationalize (x : float) : rational =    //conversione dei float in rational con approccio aitmetico 
+let rationalize (x : float) : rational =    //conversione dei float in rational con approccio aritmetico 
     let rec  aux (numero:float) (app:float) = if(numero*app%10.=0.) then rational(int(numero),int(app))
                                                                          else aux (numero*10.) (app*10.)
     in aux x 1.
@@ -100,7 +100,7 @@ let solve0 (np : normalized_polynomial) : bool =
 
 let solve1 (np : normalized_polynomial) : rational = 
     (*ricavo l'array di rational dal parametro. Il polinomio associato sarà di grado 1 e verrà passato dal main come un unico polinomio concatenando la parte prima dell'= con quella dopo.
-    Otterremo così un'espressione del tipo ax + c = 0 (abbiamo un polinomio normalizzato), quindi troveremo x con l'operazione -c/a *)
+    Otterremo così un'espressione del tipo ax + c = 0 (abbiamo un polinomio normalizzato), quindi troveremo x = -c/a *)
     match np with
     NormalizedPolynomial arr -> -(arr.[0]/arr.[1])
 
