@@ -72,8 +72,8 @@ let interpreter_loop () =
                                                                     hout "degree" "%O" equDegree
 
                                                                     if Impl.polynomial_degree(Polynomial(monomialList)) = 0 then
-                                                                        if Impl.solve0(normalizedList) then ident "%O" "True"
-                                                                                                       else ident "%O" "False"
+                                                                        if Impl.solve0(normalizedList) then ident "%O" "true"
+                                                                                                       else ident "%O" "false"
 
                                                                     else if Impl.polynomial_degree(Polynomial(monomialList)) = 1 then
                                                                      let resultGradeOne = Impl.solve1(normalizedList)
@@ -85,10 +85,13 @@ let interpreter_loop () =
                                                                       let mutable x1 = 0.
                                                                       let mutable x2 : float option = None
                                                                       match resultGradeTwo with
-                                                                      |Some (a, b) -> x1 <- a
-                                                                                      x2 <- b
-                                                                      |None -> x1<-0.
-                                                                      sol "x1 = %O vel x2 = %O" x1 x2.Value
+                                                                      |Some (a, Some b) -> x1 <- a
+                                                                                           x2 <- Some b
+                                                                                           sol "x1 = %O vel x2 = %O" x1 x2.Value
+                                                                      |Some (a, None) -> x1 <- a
+                                                                                         x2 <- None
+                                                                                         sol "x = %O" x1 
+                                                                      |None -> sol "Delta < 0: Equazione impossibile."
     
             //functionOutputExpr svolge la stessa funzione di functionOutputEqu solo che questo viene invocato all'interno del match di Expr.
             let functionOutputExpr (toDer : expr) = let reduxExpr = Impl.reduce(toDer)
