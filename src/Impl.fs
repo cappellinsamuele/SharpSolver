@@ -5,6 +5,11 @@
  * (C) 2018 Alvise Spano' @ Universita' Ca' Foscari di Venezia
  *)
 
+ (*
+ PROGETTO DI:
+ CAPPELLIN SAMUELE 876365
+ MAROSTICA RICCARDO 874154
+ *)
 module SharpSolver.Impl
 
 open Absyn
@@ -52,20 +57,6 @@ let normalized_polynomial_degree (np : normalized_polynomial) : int =
 let sumCoeffs (coeffs: rational[]) (pos:int) (coef:rational) : rational[] = //Metodo usato in normalize per sommare i coefficienti dello stesso grado (quindi stessa posizione dell'array) restituendo un array
     coeffs.[pos] <- coeffs.[pos]+coef 
     coeffs
-let validPositions (arr:rational[]) : int = //Metodo che serve a normalizeArray per contare quante sono le posizioni con coefficienti non nulli
-    let mutable pos = 0
-    for i in arr do
-        if (i<>rational.Zero) then pos<-pos+1
-    pos
-let normalizeArray (arr:rational[]) : rational[] = 
-    //Metodo che prende in un array di rational e restituisce lo stesso array a cui vengono però tolti i coefficienti uguali a 0. Questo perché altrimenti la funzione normalized_polynomial_degree restituirebbe un valore sbagliato
-    let res = Array.create (validPositions arr) (rational.Zero)
-    let mutable pos = 0
-    for r in arr do
-        if (r<>rational.Zero) 
-            then res.[pos] <- r
-                 pos <- pos + 1
-    res
 let normalize (p : polynomial) : normalized_polynomial = 
     (*STEPS:
         -> ricavare il grado del polinomio e creo un array con dimensione pari al grado del polinomio (con gli elementi a zero)
@@ -80,6 +71,9 @@ let normalize (p : polynomial) : normalized_polynomial =
     NormalizedPolynomial(normalPol) 
     //NormalizedPolynomial(normalizeArray normalPol) //"normalizzo" l'array (rimuovendo gli elementi nulli altrimenti il grado verrebbe restituito sbagliato) e ritorno un tipo NormalizedPolynomial
 
+
+                                   
+                                
 
 let derive (p : polynomial) : polynomial =
     match p with

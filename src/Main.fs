@@ -4,6 +4,11 @@
  * (C) 2018 Alvise Spano' @ Universita' Ca' Foscari di Venezia
  *)
 
+ (*
+ PROGETTO DI:
+ CAPPELLIN SAMUELE 876365
+ MAROSTICA RICCARDO 874154
+ *)
 module SharpSolver.Main
 
 open Microsoft.FSharp.Text.Lexing
@@ -64,6 +69,21 @@ let interpreter_loop () =
             hout "pretty" "%O" line
             #endif
 
+            let validPositions (arr:rational[]) : int = //Metodo che serve a normalizeArray per contare quante sono le posizioni con coefficienti non nulli
+                let mutable pos = 0
+                for i in arr do
+                    if (i<>rational.Zero) then pos<-pos+1
+                pos
+            let normPrint (np:normalized_polynomial) = //Metodo che serve per la stampa del polinomio normalizzato. rimuove gli zeri dall'output. Zeri che tuttavia sono necessari per il corretto fuznionamento degli altri metodi
+                 match np with
+                 NormalizedPolynomial arr -> let res = Array.create (validPositions arr) (rational.Zero)
+                                             let mutable pos = 0
+                                             for r in arr do
+                                                if (r<>rational.Zero) 
+                                                    then res.[pos] <- r
+                                                         pos <- pos + 1
+                                             NormalizedPolynomial(res)
+
             //functionOutputEqu: metodo che viene chiamato nel pattern Match di Equ. Viene utilizzato questo metodo in modo tale da evitare la ripetizione del codice degli output in ogni caso del pattern match di Equ
             let functionOutputEqu (monomialList : monomial list) =  let normalizedList = Impl.normalize(Polynomial(monomialList))
                                                                     norm "%O = 0" normalizedList
@@ -98,7 +118,8 @@ let interpreter_loop () =
             let functionOutputExpr (toDer : expr) = let reduxExpr = Impl.reduce(toDer)
                                                     redux "%O" reduxExpr
                                                     let normalizedExpr = Impl.normalize reduxExpr
-                                                    norm "%O" normalizedExpr
+                                                    let nPrint = normPrint normalizedExpr
+                                                    norm "%O" nPrint
                                                     let polynomialDegree = Impl.normalized_polynomial_degree(normalizedExpr)
                                                     hout "degree" "%O" polynomialDegree
 
