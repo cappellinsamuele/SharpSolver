@@ -69,7 +69,7 @@ let interpreter_loop () =
             hout "pretty" "%O" line
             #endif
 
-            let validPositions (arr:rational[]) : int = //Metodo che serve a normalizeArray per contare quante sono le posizioni con coefficienti non nulli
+            let validPositions (arr:rational[]) : int = //Metodo che serve a normPrint per contare quante sono le posizioni con coefficienti non nulli
                 let mutable pos = 0
                 for i in arr do
                     if (i<>rational.Zero) then pos<-pos+1
