@@ -74,7 +74,7 @@ let interpreter_loop () =
             let functionOutputEqu (monomialList : monomial list) =  let normalizedList = Impl.normalize(Polynomial(monomialList))
                                                                     norm "%O = 0" normalizedList
 
-                                                                    let equDegree = Impl.polynomial_degree(Polynomial(monomialList))
+                                                                    let equDegree = Impl.normalized_polynomial_degree(normalizedList)
                                                                     hout "degree" "%O" equDegree
 
                                                                     //In base al grado del polinomio, verrà eseguito uno dei tre metodi per la risoluzione dell'equazione, ossia solve0, solve1 oppure solve2
@@ -82,11 +82,11 @@ let interpreter_loop () =
                                                                         if Impl.solve0(normalizedList) then ident "%O" "true"
                                                                                                        else ident "%O" "false"
 
-                                                                    else if Impl.polynomial_degree(Polynomial(monomialList)) = 1 then
+                                                                    else if Impl.normalized_polynomial_degree(normalizedList) = 1 then
                                                                      let resultGradeOne = Impl.solve1(normalizedList)
                                                                      sol "x = %O" resultGradeOne
 
-                                                                    else if Impl.polynomial_degree(Polynomial(monomialList)) = 2 then   
+                                                                    else if Impl.normalized_polynomial_degree(normalizedList) = 2 then   
                                                                       let resultGradeTwo = Impl.solve2(normalizedList)
                                                                       //Scompatto il valore di resultGradeTwo così da ottenere i valori x1,x2 dell'equazione di secondo grado
                                                                       let mutable x1 = 0.
