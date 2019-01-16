@@ -12,6 +12,7 @@ open Prelude
 open System
 open System.Runtime.Remoting.Metadata.W3cXsd2001
 open System
+open System.Linq.Expressions
 
 let rationalize (x : float) : rational =    //conversione dei float in rational con approccio aritmetico 
     let rec  aux (numero:float) (app:float) = if(numero*app%10.=0.) then rational(int(numero),int(app))
@@ -44,6 +45,20 @@ let normalized_polynomial_degree (np : normalized_polynomial) : int =
 let sumCoeffs (coeffs: rational[]) (pos:int) (coef:rational) : rational[] = //Metodo usato in normalize per sommare i coefficienti dello stesso grado (quindi stessa posizione dell'array) restituendo un array
     coeffs.[pos] <- coeffs.[pos]+coef 
     coeffs
+let validPositions (arr:rational[]) : int = //Metodo che serve a normalizeArray per contare quante sono le posizioni con coefficienti non nulli
+    let mutable pos = 0
+    for i in arr do
+        if (i<>rational.Zero) then pos<-pos+1
+    pos
+let normalizeArray (arr:rational[]) : rational[] = 
+    //Metodo che prende in un array di rational e restituisce lo stesso array a cui vengono però tolti i coefficienti uguali a 0. Questo perché altrimenti la funzione normalized_polynomial_degree restituirebbe un valore sbagliato
+    let res = Array.create (validPositions arr) (rational.Zero)
+    let mutable pos = 0
+    for r in arr do
+        if (r<>rational.Zero) 
+            then res.[pos] <- r
+                 pos <- pos + 1
+    res
 let normalize (p : polynomial) : normalized_polynomial = 
     (*STEPS:
         -> ricavare il grado del polinomio e creo un array con dimensione pari al grado del polinomio (con gli elementi a zero)
@@ -51,11 +66,11 @@ let normalize (p : polynomial) : normalized_polynomial =
     *)  
     let normalPol = Array.create (polynomial_degree p + 1) (rational.Zero)
         in
-            let rec scan lst results = match lst with //scorro la lista di monomi contenuta in p e all'aaray results aggiungo il coefficiente nella posizone indicata dal grado del monomio
+            let rec scan lst results = match lst with //scorro la lista di monomi contenuta in p e all'array results aggiungo il coefficiente nella posizone indicata dal grado del monomio
                                          Polynomial([]) -> results
                                          |Polynomial(Monomial(coeff,deg)::xs) -> scan (Polynomial xs) (sumCoeffs results deg coeff)
             in let a=scan p normalPol
-    NormalizedPolynomial(normalPol) //ritorno un tipo NormalizedPolynomial
+    NormalizedPolynomial(normalizeArray normalPol) //"normalizzo" l'array (rimuovendo gli elementi nulli altrimenti il grado verrebbe restituito sbagliato) e ritorno un tipo NormalizedPolynomial
 
 
 let derive (p : polynomial) : polynomial =
