@@ -36,12 +36,19 @@ let polynomial_negate (p : polynomial) : polynomial = match p with //ricavo la l
 
 let normalized_polynomial_degree (np : normalized_polynomial) : int = 
     match np with
-    NormalizedPolynomial arr -> //Array.length (arr) -1 //ricavo l'array dall'argomento np e lo scorro contando gli elementi. il numero di elementi corrisponde al grado del polinomio
-                                let mutable count =  -1
+    NormalizedPolynomial arr -> //scorro l'array: se trovo un coefficiente nullo non considero il grado, altrimenti confronto se è più grande di quello trovato nei cicli precedenti 
+                                let mutable deg = 0
+                                let mutable pos_deg = -1
                                 for i in arr do
-                                    count <- count+1
-                                count
-
+                                    if (i<>rational.Zero) 
+                                        then 
+                                            if (pos_deg < deg) 
+                                                then    
+                                                        pos_deg<-deg  
+                                                        deg<-deg+1
+                                        else deg <- deg + 1
+                                pos_deg
+                                
 let sumCoeffs (coeffs: rational[]) (pos:int) (coef:rational) : rational[] = //Metodo usato in normalize per sommare i coefficienti dello stesso grado (quindi stessa posizione dell'array) restituendo un array
     coeffs.[pos] <- coeffs.[pos]+coef 
     coeffs
@@ -70,7 +77,8 @@ let normalize (p : polynomial) : normalized_polynomial =
                                          Polynomial([]) -> results
                                          |Polynomial(Monomial(coeff,deg)::xs) -> scan (Polynomial xs) (sumCoeffs results deg coeff)
             in let a=scan p normalPol
-    NormalizedPolynomial(normalizeArray normalPol) //"normalizzo" l'array (rimuovendo gli elementi nulli altrimenti il grado verrebbe restituito sbagliato) e ritorno un tipo NormalizedPolynomial
+    NormalizedPolynomial(normalPol) 
+    //NormalizedPolynomial(normalizeArray normalPol) //"normalizzo" l'array (rimuovendo gli elementi nulli altrimenti il grado verrebbe restituito sbagliato) e ritorno un tipo NormalizedPolynomial
 
 
 let derive (p : polynomial) : polynomial =
