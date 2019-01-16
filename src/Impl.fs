@@ -44,6 +44,8 @@ let normalized_polynomial_degree (np : normalized_polynomial) : int =
 let sumCoeffs (coeffs: rational[]) (pos:int) (coef:rational) : rational[] = //Metodo usato in normalize per sommare i coefficienti dello stesso grado (quindi stessa posizione dell'array) restituendo un array
     coeffs.[pos] <- coeffs.[pos]+coef 
     coeffs
+     
+
 let normalize (p : polynomial) : normalized_polynomial = 
     (*STEPS:
         -> ricavare il grado del polinomio e creo un array con dimensione pari al grado del polinomio (con gli elementi a zero)
